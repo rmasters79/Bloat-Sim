@@ -14,21 +14,23 @@ def calc_max_hit(player):
     return int(max_hit)
 
 
-def calc_attack_roll(player):
+def calc_attack_roll(player, salve):
     mel_boost = 19
     atk_prayer_boost = 1.20
-    effective_attack = (player.atk_level + mel_boost) * atk_prayer_boost + 8
-    attack_roll = effective_attack * (player.acc_bonus + 64)
-    return attack_roll
+    effective_attack = int((player.atk_level + mel_boost) * atk_prayer_boost + 8)
+    attack_roll = int(effective_attack * (player.acc_bonus + 64))
+    if salve:
+        attack_roll *= 1.2
+    return int(attack_roll)
 
 
 def calc_defence_roll(def_level, def_bonus):
     return (def_level + 9) * (def_bonus + 64)
 
 
-def calc_hit_chance(player, def_level, def_bonus):
+def calc_hit_chance(player, def_level, def_bonus, salve):
     defence_roll = calc_defence_roll(def_level, def_bonus)
-    attack_roll = calc_attack_roll(player)
+    attack_roll = calc_attack_roll(player, salve)
     if attack_roll > defence_roll:
         hit_chance = 1 - ((defence_roll + 2) / (2 * (attack_roll + 1)))
     else:
@@ -36,8 +38,8 @@ def calc_hit_chance(player, def_level, def_bonus):
     return hit_chance
 
 
-def roll_bgs(rng, bgs, def_level, def_bonus):
-    accuracy = calc_hit_chance(bgs, def_level, def_bonus)
+def roll_bgs(rng, bgs, def_level, def_bonus, salve):
+    accuracy = calc_hit_chance(bgs, def_level, def_bonus, salve)
     if np.random.rand() > accuracy * 2:
         return 0
     else:
@@ -47,7 +49,7 @@ def roll_bgs(rng, bgs, def_level, def_bonus):
 
 def roll_claw(rng, claw, def_level, def_bonus, print_specs=False):
     max_hit = int(calc_max_hit(claw) * SALVE_MULTIPLIER)
-    accuracy = calc_hit_chance(claw, def_level, def_bonus)
+    accuracy = calc_hit_chance(claw, def_level, def_bonus, 1)
     hits = []
 
     for _ in range(4):
