@@ -38,6 +38,37 @@ def calc_hit_chance(player, def_level, def_bonus, salve):
     return hit_chance
 
 
+def roll_scy(scy, def_level, def_bonus, salve, bloat_walking, print_hits=False):
+    accuracy = calc_hit_chance(scy, def_level, def_bonus, salve)
+    if salve:
+        max1 = int(calc_max_hit(scy) * SALVE_MULTIPLIER)
+    else:
+        max1 = calc_max_hit(scy)
+    if bloat_walking:
+        max1 = max1 // 2
+    max2 = max1 // 2
+    max3 = max2 // 2
+
+    # Roll each hit
+    if np.random.rand() > accuracy:
+        hit1 = 0
+    else:
+        hit1 = np.random.randint(0, max1)
+    if np.random.rand() > accuracy:
+        hit2 = 0
+    else:
+        hit2 = np.random.randint(0, max2)
+    if np.random.rand() > accuracy:
+        hit3 = 0
+    else:
+        hit3 = np.random.randint(0, max3)
+
+    total = hit1 + hit2 + hit3
+    if print_hits:
+        print(f"Scy: {hit1}-{hit2}-{hit3} ({total})")
+    return total
+
+
 def roll_bgs(rng, bgs, def_level, def_bonus, salve):
     accuracy = calc_hit_chance(bgs, def_level, def_bonus, salve)
     if np.random.rand() > accuracy * 2:

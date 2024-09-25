@@ -1,8 +1,8 @@
 # main.py
 import tkinter as tk
-from gui import BloatSimGUI
+from gui import ImageGrid
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = BloatSimGUI(root)
+    app = ImageGrid(root)
     root.mainloop()
