@@ -7,7 +7,7 @@ from bloat_simulation import main_simulation
 class ImageGrid:
     def __init__(self, root):
         self.root = root
-        self.root.title("Dynamic Image Grid")
+        self.root.title("Bloat Sim")
 
         # Frame for row input
         self.input_frame = tk.Frame(self.root)

@@ -78,39 +78,54 @@ def roll_bgs(rng, bgs, def_level, def_bonus, salve):
         return np.random.randint(0, bgs_max)
 
 
-def roll_claw(rng, claw, def_level, def_bonus, print_specs=False):
-    max_hit = int(calc_max_hit(claw) * SALVE_MULTIPLIER)
-    accuracy = calc_hit_chance(claw, def_level, def_bonus, 1)
-    hits = []
+def roll_claw(claw, def_level, def_bonus, print_specs=False):
+    max_hit = int(calc_max_hit(claw))
+    accuracy = calc_hit_chance(claw, def_level, def_bonus, True)
+    claw1 = claw2 = claw3 = claw4 = 0
 
-    for _ in range(4):
-        if np.random.rand() < accuracy:
-            if len(hits) == 0:
-                min_hit = max_hit // 2
-                temp_max_hit = max_hit - 1
-                hits.append(np.random.randint(min_hit, max_hit))
-            elif len(hits) == 1:
-                hits.append(hits[0] // 2)
-            elif len(hits) == 2:
-                hits.append(hits[1] // 2)
-            else:
-                hits.append(hits[2] + 1)
-        else:
-            hits.append(0)
+    # First hit attempt
+    if np.random.rand() < accuracy:
+        # If the first attack hits, then its max hit will be 1 point less than the max hit of an ordinary attack. The
+        # minimum hit will be half of the ordinary max hit
+        min_hit = max_hit // 2
+        claw1 = np.random.randint(min_hit, max_hit)  # Roll between min_hit and max_hit - 1
+        claw2 = claw1 // 2
+        claw3 = claw2 // 2
+        claw4 = claw3 + 1
 
-    if sum(hits[:2]) == 0:
-        min_hit = int(0.25 * max_hit)
-        temp_max_hit = int(0.75 * max_hit)
-        hits[2] = np.random.randint(min_hit, temp_max_hit)
-        hits[3] = hits[2] + 1
-    elif hits[0] == 0:
+    # Second hit attempt
+    elif np.random.rand() < accuracy:
+        # If the first hit is 0 and the second one hits, then the second hit will deal between about 3/8 and 7/8 of
+        # the ordinary maximum hit
         min_hit = int(0.375 * max_hit)
         temp_max_hit = int(0.875 * max_hit)
-        hits[1] = np.random.randint(min_hit, temp_max_hit)
-        hits[2] = hits[1] // 2
-        hits[3] = hits[2] + 1
+        claw2 = np.random.randint(min_hit, temp_max_hit + 1)
+        claw3 = claw2 // 2
+        claw4 = claw3 + 1
 
-    damage = sum(hits)
+    # Third hit attempt
+    elif np.random.rand() < accuracy:
+        # If the first two attacks hit 0–0, the third attack will deal between about 1/4 and 3/4 of the ordinary max hit
+        min_hit = int(0.25 * max_hit)
+        temp_max_hit = int(0.75 * max_hit)
+        claw3 = np.random.randint(min_hit, temp_max_hit + 1)  # Third hit roll
+        claw4 = claw3 + 1
+
+    # Fourth hit attempt
+    elif np.random.rand() < accuracy:
+        # If the claws' first 3 hits are zeros, the last hit (if successful) will deal between 0.25x and 1.25x
+        # ordinary damage
+        min_hit = int(0.25 * max_hit)
+        temp_max_hit = int(1.25 * max_hit)
+        claw4 = np.random.randint(min_hit, temp_max_hit + 1)  # Fourth hit roll
+
+    # If all four attacks miss, there is a 50% chance of rolling 0-0-1-1 instead of 0-0-0-0
+    elif np.random.rand() < 0.5:
+        claw3, claw4 = 1, 1
+
+    damage = claw1 + claw2 + claw3 + claw4
+
     if print_specs:
-        print(f"Claw Spec: {'-'.join(map(str, hits))} ({damage})")
+        print(f"Claw Spec: {claw1}-{claw2}-{claw3}-{claw4} ({damage})")
+
     return damage

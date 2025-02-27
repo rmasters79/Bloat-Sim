@@ -48,7 +48,6 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
         # Change the 3rd bgs to a salve hit if low def
         else:
             bonus_salve_hits.append(bgs_hits[2])
-            print(f"Added {bgs_hits[2]} to bonus_salve_hits")
 
         if bloat_def > 15:
             bgs4 = roll_bgs(rng, bgs, (bloat_def + int(bgs4_tick * 0.2)), BLOAT_SLASH_DEF, 1)
@@ -60,7 +59,6 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
         # Change the 4th bgs to a salve hit if low def
         else:
             bonus_salve_hits.append(bgs_hits[3])
-            print(f"Added {bgs_hits[3]} to bonus_salve_hits")
 
         if bloat_def < 0:
             bloat_def = 0
