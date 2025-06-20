@@ -23,10 +23,25 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
         total_dmg = 0
         bloat_def = 100
         down_tick = get_down_tick()
-        bgs2_tick = bgs_hits[1]
-        bgs3_tick = bgs_hits[2]
-        bgs4_tick = bgs_hits[3]
+        all_bgs_hits = [tick for ticks in bgs_hits.values() for tick in ticks]
+        all_bgs_hits = sorted(all_bgs_hits)
+        bgs2_tick = all_bgs_hits[1]
+        bgs3_tick = all_bgs_hits[2]
+        bgs4_tick = all_bgs_hits[3]
         bonus_salve_hits = []
+
+        # Initialize salve_hits as a dictionary
+        salve_hits = {}
+
+        # Iterate through each key-value pair in neck_hits
+        for player, tick_list in neck_hits.items():
+            first_hit_tick = tick_list[-1] - down_tick
+            salve_hit_ticks = []
+            for tick in range(first_hit_tick % 5, 32, 5):
+                salve_hit_ticks.append(tick)
+
+            # Store the computed list in salve_hits
+            salve_hits[player] = salve_hit_ticks
 
         bgs1 = roll_bgs(rng, bgs, bloat_def, BLOAT_SLASH_DEF, 1)
         bloat_def -= bgs1
@@ -47,7 +62,7 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
                 print(f"BGS 3: {bgs3}")
         # Change the 3rd bgs to a salve hit if low def
         else:
-            bonus_salve_hits.append(bgs_hits[2])
+            bonus_salve_hits.append(all_bgs_hits[2])
 
         if bloat_def > 15:
             bgs4 = roll_bgs(rng, bgs, (bloat_def + int(bgs4_tick * 0.2)), BLOAT_SLASH_DEF, 1)
@@ -58,7 +73,7 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
                 print(f"BGS 4: {bgs4}")
         # Change the 4th bgs to a salve hit if low def
         else:
-            bonus_salve_hits.append(bgs_hits[3])
+            bonus_salve_hits.append(all_bgs_hits[3])
 
         if bloat_def < 0:
             bloat_def = 0
@@ -67,44 +82,38 @@ def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
 
         # Bloat regens 1 defence every 5 ticks, roll each scythe based on the tick/defence
         necking_damage = 0
-        for tick in neck_hits:
-            if tick < down_tick:
-                necking_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 0, 1, low_num_trials)
+        for player, tick_list in neck_hits.items():  # Iterate over rows
+            for tick in tick_list:  # Iterate over tick values in each row
+                if tick < down_tick:
+                    if low_num_trials:
+                        print(f"Player: {player + 1} Tick: {tick}")
+                    necking_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 0, 1,
+                                               low_num_trials)
 
         half_salve_damage = 0
-        for tick in half_salve_hits:
-            if tick < down_tick:
-                half_salve_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 1, 1,
-                                              low_num_trials)
+        for player, tick_list in half_salve_hits.items():  # Iterate over rows
+            for tick in tick_list:
+                if tick < down_tick:
+                    if low_num_trials:
+                        print(f"Player: {player + 1} Tick: {tick}")
+                    half_salve_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 1, 1,
+                                                  low_num_trials)
         for tick in bonus_salve_hits:
             if tick < down_tick:
                 half_salve_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 1, 1,
                                               low_num_trials)
 
-        # Find tick for the first 3 scythe swings, based on the last 3 neck hits
-        salve_hits = []
-        salve_hits.append(neck_hits[-1] - down_tick)
-        salve_hits.append(neck_hits[-2] - down_tick)
-        salve_hits.append(neck_hits[-3] - down_tick)
-
-        # Add other hits to the array
-        for tick in range(salve_hits[0] % 5, 32, 5):
-            salve_hits.append(tick)
-        for tick in range(salve_hits[1] % 5, 32, 5):
-            salve_hits.append(tick)
-        for tick in range(salve_hits[2] % 5, 32, 5):
-            salve_hits.append(tick)
-        # Delete the first 3 (duplicates)
-        del salve_hits[:3]
-
         bloat_def += int(down_tick * 0.2)
         salve_damage = 0
-        for tick in salve_hits:
-            salve_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 1, 0,
-                                     low_num_trials)
+        for player, tick_list in salve_hits.items():  # Iterate over rows
+            for tick in tick_list:
+                if low_num_trials:
+                    print(f"Player: {player + 1} Tick: {tick}")
+                salve_damage += roll_scy(scythe, (bloat_def + int(tick * 0.2)), BLOAT_SLASH_DEF, 1, 0,
+                                         low_num_trials)
 
         claw_damage = np.sum(
-            [roll_claw(rng, claw, bloat_def, BLOAT_SLASH_DEF, low_num_trials) for _ in range(claw_specs)])
+            [roll_claw(claw, bloat_def, BLOAT_SLASH_DEF, low_num_trials) for _ in range(claw_specs)])
 
         total_dmg += necking_damage + half_salve_damage + salve_damage + claw_damage
 

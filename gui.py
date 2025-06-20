@@ -123,26 +123,34 @@ class ImageGrid:
         self.selected_images[(row, col)] = new_image_key  # Track the newly selected image for this row/col
 
     def run_simulation(self):
-        # Clear arrays for each image before rebuilding
-        self.image_arrays = {key: [] for key in self.images}
+        # Clear arrays for each image type before rebuilding
+        self.image_arrays = {key: {} for key in self.images}
 
-        # Iterate through selected images and populate arrays
+        # Iterate through selected images and populate arrays, grouped by row
         for (row, col), image_key in self.selected_images.items():
-            self.image_arrays[image_key].append(col + 1)  # Add column number (1-indexed)
+            if row not in self.image_arrays[image_key]:
+                self.image_arrays[image_key][row] = []
+            self.image_arrays[image_key][row].append(col + 1)  # Add column number (1-indexed)
 
         # Display results
-        result_text = "\n".join([f"{label}: {columns}" for label, columns in self.image_arrays.items()])
+        result_text = "\n".join([
+            f"{label} (Row {row}): {columns}"
+            for label, rows in self.image_arrays.items()
+            for row, columns in rows.items()
+        ])
         self.result_label.config(text=result_text)
 
-        bgs_hit_ticks = sorted(self.image_arrays['BGS hit'])
-        salve_hit_ticks = sorted(self.image_arrays['Salve hit'])
-        neck_hit_ticks = sorted(self.image_arrays['Neck hit'])
+        # Extract row-wise sorted lists
+        bgs_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['BGS hit'].items()}
+        salve_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['Salve hit'].items()}
+        neck_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['Neck hit'].items()}
 
         try:
             trials = int(self.trials_entry.get())
             if trials <= 0:
                 raise ValueError("Number of trials must be positive.")
 
+            # Call main_simulation with the new row-based structure
             probability = main_simulation(trials, bgs_hit_ticks, salve_hit_ticks, neck_hit_ticks)
             self.result_label.config(text=f"1D Chance: {probability:.2f}%")
 
