@@ -38,7 +38,7 @@ def calc_hit_chance(player, def_level, def_bonus, salve):
     return hit_chance
 
 
-def roll_scy(scy, def_level, def_bonus, salve, bloat_walking, print_hits=False):
+def roll_scy(scy, def_level, def_bonus, salve, bloat_walking):
     accuracy = calc_hit_chance(scy, def_level, def_bonus, salve)
     if salve:
         max1 = int(calc_max_hit(scy) * SALVE_MULTIPLIER)
@@ -64,8 +64,6 @@ def roll_scy(scy, def_level, def_bonus, salve, bloat_walking, print_hits=False):
         hit3 = np.random.randint(0, max3)
 
     total = hit1 + hit2 + hit3
-    if print_hits:
-        print(f"Scy: {hit1}-{hit2}-{hit3} ({total})")
     return total
 
 
@@ -78,7 +76,7 @@ def roll_bgs(rng, bgs, def_level, def_bonus, salve):
         return np.random.randint(0, bgs_max)
 
 
-def roll_claw(claw, def_level, def_bonus, print_specs=False):
+def roll_claw(claw, def_level, def_bonus):
     max_hit = int(calc_max_hit(claw))
     accuracy = calc_hit_chance(claw, def_level, def_bonus, True)
     claw1 = claw2 = claw3 = claw4 = 0
@@ -124,8 +122,4 @@ def roll_claw(claw, def_level, def_bonus, print_specs=False):
         claw3, claw4 = 1, 1
 
     damage = claw1 + claw2 + claw3 + claw4
-
-    if print_specs:
-        print(f"Claw Spec: {claw1}-{claw2}-{claw3}-{claw4} ({damage})")
-
     return damage
