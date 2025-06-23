@@ -47,6 +47,7 @@ class ImageGrid:
             "Salve hit": self.load_and_resize_image("icons/Salve amulet (e).png"),
             "Neck hit": self.load_and_resize_image("icons/Phoenix necklace.png"),
             "BGS hit": self.load_and_resize_image("icons/Bandos godsword.png"),
+            "Backup BGS hit": self.load_and_resize_image("icons/Backup BGS.png")
         }
 
         # Prepare arrays for each image
@@ -143,6 +144,7 @@ class ImageGrid:
 
         # Extract row-wise sorted lists
         bgs_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['BGS hit'].items()}
+        backup_bgs_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['Backup BGS hit'].items()}
         salve_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['Salve hit'].items()}
         neck_hit_ticks = {row: sorted(cols) for row, cols in self.image_arrays['Neck hit'].items()}
 
@@ -154,6 +156,7 @@ class ImageGrid:
             sim_input = SimulationInput(
                 trials=trials,
                 bgs_hits=bgs_hit_ticks,
+                backup_bgs_hits=backup_bgs_hit_ticks,
                 half_salve_hits=salve_hit_ticks,
                 neck_hits=neck_hit_ticks
             )
