@@ -3,6 +3,8 @@ import logging
 from player_stats import PlayerStats
 from combat import roll_scy, roll_bgs, roll_claw, calc_hit_chance, calc_max_hit
 from simulation_utils import calc_total_damage, get_down_tick
+from simulation_input import SimulationInput
+
 
 BLOAT_SLASH_DEF = 20
 SALVE_MULTIPLIER = 1.20
@@ -13,10 +15,15 @@ logging.basicConfig(level=logging.WARNING, filename="simulation.log", filemode="
 # Suppress Pillow's internal debug logs
 logging.getLogger("PIL").setLevel(logging.WARNING)
 
-def main_simulation(trials, bgs_hits, half_salve_hits, neck_hits):
+
+def main_simulation(sim_input: SimulationInput) -> float:
+    trials = sim_input.trials
+    bgs_hits = sim_input.bgs_hits
+    half_salve_hits = sim_input.half_salve_hits
+    neck_hits = sim_input.neck_hits
+
     rng = np.random.default_rng()
     successful_trials = 0
-    low_num_trials = trials <= 100
 
     str_level = atk_level = 99
     bloat_hp = 1500

@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from bloat_simulation import main_simulation
+from simulation_input import SimulationInput
 
 
 class ImageGrid:
@@ -150,8 +151,15 @@ class ImageGrid:
             if trials <= 0:
                 raise ValueError("Number of trials must be positive.")
 
+            sim_input = SimulationInput(
+                trials=trials,
+                bgs_hits=bgs_hit_ticks,
+                half_salve_hits=salve_hit_ticks,
+                neck_hits=neck_hit_ticks
+            )
+
             # Call main_simulation with the new row-based structure
-            probability = main_simulation(trials, bgs_hit_ticks, salve_hit_ticks, neck_hit_ticks)
+            probability = main_simulation(sim_input)
             self.result_label.config(text=f"1D Chance: {probability:.2f}%")
 
         except ValueError as e:
@@ -162,4 +170,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = ImageGrid(root)
     root.mainloop()
-
