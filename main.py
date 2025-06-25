@@ -1,8 +1,6 @@
-# main.py
-import tkinter as tk
-from gui import ImageGrid
+from app import create_app
+
+app = create_app()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = ImageGrid(root)
-    root.mainloop()
+    app.run(debug=True)
