@@ -1,6 +1,6 @@
 # combat.py
 import numpy as np
-from player_stats import PlayerStats
+from .player_stats import PlayerStats
 
 BLOAT_SLASH_DEF = 20
 SALVE_MULTIPLIER = 1.20

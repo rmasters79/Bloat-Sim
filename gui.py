@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
 from PIL import Image, ImageTk
-from bloat_simulation import main_simulation
-from simulation_input import SimulationInput
+from simulation.bloat_simulation import main_simulation
+from simulation.simulation_input import SimulationInput
 
 
 class ImageGrid:
