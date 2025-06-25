@@ -5,7 +5,7 @@ from combat import roll_scy, roll_bgs, roll_claw, calc_hit_chance, calc_max_hit
 from simulation_utils import calc_total_damage, get_down_tick
 from simulation_input import SimulationInput
 
-
+# Initial branch commit
 BLOAT_SLASH_DEF = 20
 SALVE_MULTIPLIER = 1.20
 
